@@ -10,6 +10,16 @@ from django.views import View
 
 from .services import cleanup_old_jobs, create_job_dir, run_extraction, save_zip
 
+VERIFICATION_DIR = Path(__file__).resolve().parent.parent / "verification"
+GOOGLE_VERIFICATION_FILE = VERIFICATION_DIR / "google2aaa255fde4003d7.html"
+
+
+def google_site_verification(_request: HttpRequest) -> HttpResponse:
+    """Serve Google Search Console HTML verification at site root."""
+    if not GOOGLE_VERIFICATION_FILE.is_file():
+        return HttpResponse("Verification file not found.", status=404)
+    return FileResponse(GOOGLE_VERIFICATION_FILE.open("rb"), content_type="text/html; charset=utf-8")
+
 
 class HomeView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
