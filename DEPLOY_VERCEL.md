@@ -8,10 +8,21 @@ This project follows [Vercel’s Django guide](https://vercel.com/docs/framework
 |--------|----------|------|
 | `manage.py` | `web/manage.py` | Vercel finds Django and `DJANGO_SETTINGS_MODULE` |
 | `WSGI_APPLICATION` | `config.wsgi.application` in `web/config/settings.py` | Default WSGI (see [docs](https://vercel.com/docs/frameworks/full-stack/django#configure-the-django-entrypoint)) |
-| `tool.vercel.entrypoint` | Root `pyproject.toml` → `wsgi.py:application` | Custom entry: loads `web/` on `sys.path` |
+| `tool.vercel.entrypoint` | `api/wsgi.py:application` in `pyproject.toml` |
+| `vercel.json` | Rewrites all routes → `/api/wsgi` |
 | Dependencies | Root `pyproject.toml` + `requirements.txt` | Installs Django before build |
 | Build | `[tool.vercel.scripts] build` | `cd web && python manage.py migrate --noinput` |
 | Static files | `STATIC_ROOT` in settings | Vercel runs `collectstatic` automatically ([docs](https://vercel.com/docs/frameworks/full-stack/django#serving-static-assets)) |
+
+## Why you saw `404 NOT_FOUND`
+
+If the build finishes in **~40ms** with no `pip install` / Django steps, Vercel did **not** create a Python function. You need:
+
+1. Root **`vercel.json`** — routes all traffic to `wsgi.py` ([Python runtime](https://vercel.com/docs/functions/runtimes/python))
+2. Root **`manage.py`** — so [Django detection](https://vercel.com/docs/frameworks/full-stack/django) works
+3. Root **`requirements.txt`** + **`pyproject.toml`** — installs Django
+
+After push, the build log should show `pip install` and `migrate` (several seconds, not 38ms).
 
 ## Vercel dashboard
 
