@@ -36,9 +36,9 @@ See **[DEPLOY_VERCEL.md](./DEPLOY_VERCEL.md)** for step-by-step setup.
 Quick checklist:
 
 1. Import `Quaid5050/eml-extractor` on Vercel  
-2. Set **Root Directory** to **`web`** (not `./`)  
-3. Add env var **`DJANGO_SECRET_KEY`** (random string) and **`DJANGO_DEBUG=0`**  
-4. Deploy  
+2. Keep **Root Directory** as **`./`** (repo root) — `pyproject.toml` + `wsgi.py` handle the rest  
+3. Add **`DJANGO_SECRET_KEY`** and **`DJANGO_DEBUG=0`**  
+4. Push latest code, then **Redeploy**  
 
 ## Web UI (local)
 
