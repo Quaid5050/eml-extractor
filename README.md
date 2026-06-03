@@ -31,7 +31,7 @@ output/
 
 ## Deploy on Vercel
 
-See **[DEPLOY_VERCEL.md](./DEPLOY_VERCEL.md)** for step-by-step setup.
+See **[DEPLOY_VERCEL.md](./DEPLOY_VERCEL.md)** (aligned with [Vercel’s Django docs](https://vercel.com/docs/frameworks/full-stack/django)).
 
 Quick checklist:
 

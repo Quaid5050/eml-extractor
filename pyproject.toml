@@ -6,6 +6,7 @@ dependencies = [
   "django>=5.0,<6",
 ]
 
+# https://vercel.com/docs/frameworks/full-stack/django#configure-the-django-entrypoint
 [tool.vercel]
 entrypoint = "wsgi.py:application"
 
