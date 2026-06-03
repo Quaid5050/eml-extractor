@@ -16,3 +16,8 @@ Thumbs.db
 # Python
 __pycache__/
 *.py[cod]
+.venv/
+
+# Django web
+web/db.sqlite3
+web/media/

@@ -2,9 +2,10 @@
 
 Turn `.eml` files into clean folders—headers, plain/HTML body, and attachments—ready for review, AI pipelines, or archiving.
 
-**No install.** Python 3.9+ standard library only.
+**CLI:** Python 3.9+ standard library only.  
+**Web UI:** optional Django app — multi-upload, Tailwind UI, ZIP download.
 
-## Quick start
+## Quick start (CLI)
 
 ```bash
 git clone <your-repo-url>
@@ -28,10 +29,33 @@ output/
     report.pdf             # attachments (same folder)
 ```
 
+## Web UI (Django + Tailwind)
+
+Upload many `.eml` files in the browser, extract, and download one ZIP (same folder layout as `output/`).
+
+```bash
+make web-install   # once: .venv + Django
+make web           # http://127.0.0.1:8765/
+```
+
+1. Drag & drop or select multiple `.eml` files  
+2. Click **Extract & download ZIP**  
+3. Review the summary, then **Download ZIP**
+
+Each email in the ZIP:
+
+```
+My Subject Line/
+  email.md
+  email.html      # when the message has HTML
+  attachment.pdf
+```
+
 ## Requirements
 
 - Python **3.9+**
 - Optional: `make` (convenience only)
+- Web: `pip install -r requirements-web.txt` (or `make web-install`)
 
 ## Commands
 
@@ -39,6 +63,7 @@ output/
 |---------|-------------|
 | `make extract` | Process every `.eml` in `input/` |
 | `make clean` | Delete generated files in `output/` |
+| `make web` | Start Django upload UI |
 | `make help` | Show targets |
 
 Direct Python:
@@ -107,11 +132,15 @@ Save into `input/` then run `make extract`.
 
 ```
 eml-extractor/
-├── extract.py      # main script
+├── eml_core.py         # shared extraction logic
+├── extract.py          # CLI
+├── web/                # Django app (portal)
+│   ├── manage.py
+│   └── portal/templates/
+├── requirements-web.txt
 ├── Makefile
-├── README.md
-├── input/          # put .eml files here (gitignored)
-└── output/         # generated (gitignored)
+├── input/              # CLI input (gitignored)
+└── output/             # CLI output (gitignored)
 ```
 
 ## Use cases

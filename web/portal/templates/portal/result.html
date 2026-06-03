@@ -1,0 +1,105 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Download ready — EML Extractor{% endblock %}
+
+{% block content %}
+<section class="mb-8">
+  <div class="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-300">
+    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+    Extraction complete
+  </div>
+  <h1 class="mt-4 text-3xl font-bold text-white">Your ZIP is ready</h1>
+  <p class="mt-2 text-slate-400">
+    {{ extracted_count }} email{{ extracted_count|pluralize }} packaged
+    {% if zip_size %}· {{ zip_size|filesizeformat }}{% endif %}
+  </p>
+</section>
+
+<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+  <a
+    href="{% url 'portal:download' job_id=job_id %}"
+    class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-brand-600/30 transition hover:from-brand-500 hover:to-brand-400"
+    download
+  >
+    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M7.5 7.5L12 12m0 0l4.5-4.5M12 12V3" /></svg>
+    Download ZIP
+  </a>
+  <a href="{% url 'portal:home' %}" class="inline-flex items-center justify-center rounded-xl border border-white/20 px-6 py-4 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white">
+    Extract more emails
+  </a>
+</div>
+
+<div class="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/50">
+  <div class="border-b border-white/10 px-5 py-4">
+    <h2 class="text-sm font-semibold text-white">Summary</h2>
+  </div>
+  <dl class="grid grid-cols-2 gap-px bg-white/10 sm:grid-cols-3">
+    <div class="bg-slate-900/80 px-5 py-4">
+      <dt class="text-xs text-slate-500">Total uploaded</dt>
+      <dd class="mt-1 text-2xl font-semibold text-white">{{ batch.stats.total_input }}</dd>
+    </div>
+    <div class="bg-slate-900/80 px-5 py-4">
+      <dt class="text-xs text-slate-500">Extracted</dt>
+      <dd class="mt-1 text-2xl font-semibold text-emerald-400">{{ extracted_count }}</dd>
+    </div>
+    <div class="bg-slate-900/80 px-5 py-4">
+      <dt class="text-xs text-slate-500">Skipped</dt>
+      <dd class="mt-1 text-2xl font-semibold text-amber-400">{{ batch.stats.skipped }}</dd>
+    </div>
+    <div class="bg-slate-900/80 px-5 py-4">
+      <dt class="text-xs text-slate-500">Failed</dt>
+      <dd class="mt-1 text-2xl font-semibold text-red-400">{{ batch.stats.failed }}</dd>
+    </div>
+    <div class="bg-slate-900/80 px-5 py-4">
+      <dt class="text-xs text-slate-500">Duplicate names skipped</dt>
+      <dd class="mt-1 text-2xl font-semibold text-slate-300">{{ batch.stats.skipped_duplicate_input }}</dd>
+    </div>
+    <div class="bg-slate-900/80 px-5 py-4">
+      <dt class="text-xs text-slate-500">ZIP layout</dt>
+      <dd class="mt-1 text-sm font-medium text-slate-300">One folder per .eml</dd>
+    </div>
+  </dl>
+</div>
+
+{% if batch.results %}
+<div class="mt-8 overflow-hidden rounded-2xl border border-white/10">
+  <table class="min-w-full divide-y divide-white/10 text-sm">
+    <thead class="bg-slate-900/80">
+      <tr>
+        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">File</th>
+        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Folder in ZIP</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-white/5 bg-slate-900/40">
+      {% for row in batch.results %}
+      <tr>
+        <td class="max-w-xs truncate px-5 py-3 text-slate-200" title="{{ row.eml_name }}">{{ row.eml_name }}</td>
+        <td class="px-5 py-3">
+          {% if row.status == "success" or row.status == "updated" %}
+          <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-300">{{ row.status }}</span>
+          {% elif row.status == "failed" %}
+          <span class="inline-flex rounded-full bg-red-500/15 px-2.5 py-0.5 text-xs font-medium text-red-300">failed</span>
+          {% else %}
+          <span class="inline-flex rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-medium text-amber-300">skipped</span>
+          {% endif %}
+        </td>
+        <td class="px-5 py-3 text-slate-400">
+          {% if row.status == "success" or row.status == "updated" %}
+          {{ row.out_dir.name }}/
+          {% elif row.error %}
+          <span class="text-slate-500">{{ row.error }}</span>
+          {% else %}—{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<p class="mt-8 text-center text-xs text-slate-500">
+  ZIP structure matches CLI <code class="text-slate-400">output/&lt;email-name&gt;/email.md</code> + attachments.
+  Download links expire after about an hour.
+</p>
+{% endblock %}

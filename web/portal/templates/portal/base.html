@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}EML Extractor{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c', 700: '#c2410c' },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-full bg-slate-950 text-slate-100 font-sans antialiased">
+  <div class="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-40 right-0 h-96 w-96 rounded-full bg-brand-600/20 blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-orange-500/10 blur-3xl"></div>
+  </div>
+
+  <header class="relative border-b border-white/10 bg-slate-950/80 backdrop-blur">
+    <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <a href="{% url 'portal:home' %}" class="flex items-center gap-3 group">
+        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-sm font-bold text-white shadow-lg shadow-brand-600/30">EML</span>
+        <div>
+          <p class="text-sm font-semibold text-white group-hover:text-brand-100">EML Extractor</p>
+          <p class="text-xs text-slate-400">Headers · Markdown · HTML · Attachments</p>
+        </div>
+      </a>
+      <a href="https://github.com" class="hidden sm:inline-flex text-xs text-slate-400 hover:text-white" target="_blank" rel="noopener">Open source</a>
+    </div>
+  </header>
+
+  <main class="relative mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="relative border-t border-white/10 py-8 text-center text-xs text-slate-500">
+    Python stdlib extraction · No email data stored long-term
+  </footer>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
