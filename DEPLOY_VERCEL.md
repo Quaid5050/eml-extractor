@@ -18,7 +18,7 @@ This project follows [Vercel’s Django guide](https://vercel.com/docs/framework
 
 If the build finishes in **~40ms** with no `pip install` / Django steps, Vercel did **not** create a Python function. You need:
 
-1. Root **`vercel.json`** — routes all traffic to `wsgi.py` ([Python runtime](https://vercel.com/docs/functions/runtimes/python))
+Fixes the **`functions` pattern** error ([Vercel docs](https://vercel.com/docs/errors/error-list#unmatched-function-pattern)): use `builds` + `@vercel/python` instead of `functions` for Django WSGI.
 2. Root **`manage.py`** — so [Django detection](https://vercel.com/docs/frameworks/full-stack/django) works
 3. Root **`requirements.txt`** + **`pyproject.toml`** — installs Django
 
