@@ -12,9 +12,11 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from eml_core import RunStats, process_batch
-
 SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPT_DIR / "web"))
+
+from eml_core import RunStats, process_batch  # noqa: E402
+
 INPUT_DIR = SCRIPT_DIR / "input"
 OUTPUT_DIR = SCRIPT_DIR / "output"
 

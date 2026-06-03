@@ -29,7 +29,18 @@ output/
     report.pdf             # attachments (same folder)
 ```
 
-## Web UI (Django + Tailwind)
+## Deploy on Vercel
+
+See **[DEPLOY_VERCEL.md](./DEPLOY_VERCEL.md)** for step-by-step setup.
+
+Quick checklist:
+
+1. Import `Quaid5050/eml-extractor` on Vercel  
+2. Set **Root Directory** to **`web`** (not `./`)  
+3. Add env var **`DJANGO_SECRET_KEY`** (random string) and **`DJANGO_DEBUG=0`**  
+4. Deploy  
+
+## Web UI (local)
 
 Upload many `.eml` files in the browser, extract, and download one ZIP (same folder layout as `output/`).
 
@@ -132,15 +143,15 @@ Save into `input/` then run `make extract`.
 
 ```
 eml-extractor/
-├── eml_core.py         # shared extraction logic
-├── extract.py          # CLI
-├── web/                # Django app (portal)
+├── extract.py          # CLI (imports web/eml_core.py)
+├── web/                # Django app — Vercel root directory
+│   ├── eml_core.py
 │   ├── manage.py
-│   └── portal/templates/
-├── requirements-web.txt
-├── Makefile
-├── input/              # CLI input (gitignored)
-└── output/             # CLI output (gitignored)
+│   ├── requirements.txt
+│   └── portal/
+├── DEPLOY_VERCEL.md
+├── input/
+└── output/
 ```
 
 ## Use cases

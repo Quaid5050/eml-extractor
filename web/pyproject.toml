@@ -1,0 +1,10 @@
+[project]
+name = "eml-extractor-web"
+version = "1.0.0"
+requires-python = ">=3.12"
+dependencies = [
+  "django>=5.0,<6",
+]
+
+[tool.vercel.scripts]
+build = "python manage.py migrate --noinput"
