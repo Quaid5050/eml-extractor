@@ -168,67 +168,82 @@ def collect_attachments(msg: email.message.Message) -> list[tuple[str, bytes, st
     return results
 
 
-def write_email_txt(
+def _md_escape_cell(value: str) -> str:
+    return value.replace("|", "\\|").replace("\n", " ").strip()
+
+
+def write_email_md(
     msg: email.message.Message,
     source_name: str,
     out_dir: Path,
     saved_files: list[str],
 ) -> None:
     plain, html = get_bodies(msg)
+    subject = decode_mime_header(msg.get("Subject")) or "(no subject)"
+    extracted_at = datetime.now().isoformat(timespec="seconds")
 
     header_fields = [
-        ("Message-ID", "Message-ID"),
         ("Date", "Date"),
         ("From", "From"),
         ("To", "To"),
         ("Cc", "Cc"),
         ("Bcc", "Bcc"),
         ("Reply-To", "Reply-To"),
-        ("Subject", "Subject"),
+        ("Message-ID", "Message-ID"),
         ("Delivered-To", "Delivered-To"),
         ("Return-Path", "Return-Path"),
     ]
 
     lines = [
-        "=" * 60,
-        "EMAIL SUMMARY",
-        "=" * 60,
-        f"Source file: {source_name}",
-        f"Output folder: {out_dir.name}",
-        f"Extracted at: {datetime.now().isoformat(timespec='seconds')}",
+        f"# {subject}",
         "",
+        f"- **Source file:** `{source_name}`",
+        f"- **Output folder:** `{out_dir.name}`",
+        f"- **Extracted at:** {extracted_at}",
+        "",
+        "## Headers",
+        "",
+        "| Field | Value |",
+        "| --- | --- |",
     ]
 
     for label, header_key in header_fields:
         value = decode_mime_header(msg.get(header_key))
-        lines.append(f"{label}: {value}")
+        if value:
+            lines.append(f"| **{label}** | {_md_escape_cell(value)} |")
 
-    lines.extend(
-        [
-            "",
-            "=" * 60,
-            "PLAIN TEXT BODY",
-            "=" * 60,
-            (plain or "").strip() or "(none)",
-            "",
-            "=" * 60,
-            "HTML BODY",
-            "=" * 60,
-            (html or "").strip() or "(none)",
-            "",
-            "=" * 60,
-            "SAVED FILES",
-            "=" * 60,
-        ]
-    )
-
-    if saved_files:
-        lines.extend(f"- {name}" for name in saved_files)
+    lines.extend(["", "## Plain text body", ""])
+    plain_stripped = (plain or "").strip()
+    if plain_stripped:
+        lines.extend(["```text", plain_stripped, "```"])
     else:
-        lines.append("(no attachments)")
+        lines.append("*(none)*")
+
+    html_stripped = (html or "").strip()
+    if html_stripped:
+        (out_dir / "email.html").write_text(html_stripped, encoding="utf-8")
+        lines.extend(
+            [
+                "",
+                "## HTML body",
+                "",
+                "Open **[email.html](./email.html)** in a browser to preview the rendered email.",
+            ]
+        )
+    else:
+        lines.extend(["", "## HTML body", "", "*(none)*"])
+
+    lines.extend(["", "## Attachments", ""])
+    if saved_files:
+        for name in saved_files:
+            if name in ("email.md", "email.html"):
+                continue
+            lines.append(f"- [{name}](./{name})")
+    else:
+        lines.append("*(no attachments)*")
 
     lines.append("")
-    (out_dir / "email.txt").write_text("\n".join(lines), encoding="utf-8")
+    (out_dir / "email.md").write_text("\n".join(lines), encoding="utf-8")
 
 
 def save_attachment(out_dir: Path, filename: str, data: bytes) -> str:
@@ -251,7 +266,7 @@ def process_eml(eml_path: Path) -> ExtractResult:
     for filename, data, _ctype in collect_attachments(msg):
         saved_files.append(save_attachment(out_dir, filename, data))
 
-    write_email_txt(msg, eml_path.name, out_dir, saved_files)
+    write_email_md(msg, eml_path.name, out_dir, saved_files)
     status = "updated" if was_existing else "success"
     return ExtractResult(
         eml_name=eml_path.name,

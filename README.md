@@ -23,7 +23,8 @@ Each message becomes one folder under `output/`:
 ```
 output/
   some-message/
-    email.txt              # headers + bodies
+    email.md               # headers + bodies (GitHub/IDE preview)
+    email.html             # HTML body when present (open in browser)
     report.pdf             # attachments (same folder)
 ```
 
@@ -49,18 +50,19 @@ python3 extract.py path/to/one.eml    # specific file(s)
 
 ## What you get
 
-### `email.txt`
+### `email.md`
 
-Structured dump per message:
+Markdown summary per message (renders nicely on GitHub and in VS Code):
 
-- **Headers:** Message-ID, Date, From, To, Cc, Bcc, Reply-To, Subject, …
-- **Plain text body**
-- **HTML body**
-- **List of saved files**
+- **Title** from Subject
+- **Headers table:** Date, From, To, Cc, …
+- **Plain text body** in a fenced block
+- **HTML body:** saved as `email.html` for browser preview; raw HTML in a collapsible section in the `.md`
+- **Attachment links**
 
 ### Attachments
 
-Decoded and saved next to `email.txt` (PDFs, images, etc.).
+Decoded and saved in the same folder (PDFs, images, etc.).
 
 ## Run summary
 
@@ -114,7 +116,7 @@ eml-extractor/
 
 ## Use cases
 
-- Prep emails for **LLM / RAG** ingestion (`email.txt` + files)
+- Prep emails for **LLM / RAG** ingestion (`email.md` + files)
 - **Quote intake** or support workflows with roof reports, PDFs, images
 - **Bulk archive** exports from legal/compliance mail dumps
 - Local inspection without opening a mail client
